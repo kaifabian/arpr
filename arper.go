@@ -99,6 +99,7 @@ func main() {
 		pkt, eth, err := cli.Read()
 
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERR cli.Read: %s\n", err)
 			continue
 		}
 
@@ -121,6 +122,7 @@ func main() {
 
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERR cli.Reply: %s\n", err)
+			continue
 		}
 	}
 }
