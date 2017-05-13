@@ -16,7 +16,7 @@ var (
 	ifname = flag.String("i", "", "Network interface")
 	ethaddr = flag.String("e", "", "Ethernet address")
 
-	my_nets = []net.IPNet{}
+	myNets = []net.IPNet{}
 	args = []string{}
 )
 
@@ -63,7 +63,7 @@ func main() {
 
 		fmt.Fprintf(os.Stderr, "INFO Listening for %s\n", ipnet.String())
 
-		my_nets = append(my_nets, *ipnet)
+		myNets = append(myNets, *ipnet)
 	}
 
 	// Get interface
@@ -114,7 +114,7 @@ func main() {
 		}
 
 		// ARP request does not match our IP(s)
-		if !netsContain(my_nets, pkt.TargetIP) {
+		if !netsContain(myNets, pkt.TargetIP) {
 			continue
 		}
 
