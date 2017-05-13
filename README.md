@@ -16,6 +16,9 @@ Usage
 | -------- | ------------- | ----- |
 | -i | -   | name of the network interface to listen (and respond) on |
 | -e | (eth addr of -i) | ethernet address to respond with |
+| -g | false | enable gratuitous ARP |
+| -G | 60 | gratuitous ARP send interval (seconds) |
+| -M | 1024 | reject gratuitous ARP if more than `-M` IPs (performance implications) |
 
 `ip_net` can either be a single IP address (e. g. `10.42.13.37`) or a CIDR notation (e. g. `192.168.0.0/16`).
 
