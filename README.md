@@ -16,3 +16,7 @@ Usage
 | -------- | ------------- | ----- |
 | -i | -   | name of the network interface to listen (and respond) on |
 | -e | (eth addr of -i) | ethernet address to respond with |
+
+`ip_net` can either be a single IP address (e. g. `10.42.13.37`) or a CIDR notation (e. g. `192.168.0.0/16`).
+
+At least 1 `ip_net` must be provided.
