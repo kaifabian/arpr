@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"os"
 	"strings"
 
 	"github.com/mdlayher/arp"
@@ -29,17 +30,22 @@ func netsContain(nets []net.IPNet, ip net.IP) bool {
 	return false
 }
 
+func usageError(errmsg string) {
+	fmt.Fprintf(os.Stderr, "ERR Usage error: %s\n\n", errmsg)
+	flag.Usage()
+}
+
 func main() {
 	flag.Parse()
 	args = flag.Args()
 
 	if len(*ifname) == 0 {
-		fmt.Println("ERR", "Must specify network interface (-i)!")
+		usageError("Must specify network interface (-i)!")
 		return
 	}
 
 	if len(args) < 1 {
-		fmt.Println("ERR", "Must specify at least 1 IP address or network!")
+		usageError("Must specify at least 1 IP address or network!")
 		return
 	}
 
@@ -55,7 +61,7 @@ func main() {
 			return
 		}
 
-		fmt.Println("INFO", "Listening for ", ipnet.String())
+		fmt.Fprintf(os.Stderr, "INFO Listening for %s\n", ipnet.String())
 
 		my_nets = append(my_nets, *ipnet)
 	}
@@ -64,7 +70,7 @@ func main() {
 	ifi, err := net.InterfaceByName(*ifname)
 
 	if err != nil {
-		fmt.Println("ERR", "getInterface(", ifname, "): ", ifname, err)
+		fmt.Fprintf(os.Stderr, "ERR getInterface(%s): %s\n", ifname, err)
 		return
 	}
 
@@ -75,7 +81,7 @@ func main() {
 		hwaddr, err = net.ParseMAC(*ethaddr)
 
 		if err != nil {
-			fmt.Println("ERR", "net.ParseMAC(", *ethaddr, "): ", err)
+			fmt.Fprintf(os.Stderr, "ERR net.ParseMAC(%s): %s\n", *ethaddr, err)
 			return
 		}
 	}
@@ -84,7 +90,7 @@ func main() {
 	cli, err := arp.Dial(ifi)
 
 	if err != nil {
-		fmt.Println("ERR", "arp.Dial(if): ", err)
+		fmt.Fprintf(os.Stderr, "ERR arp.Dial(if): %s\n", err)
 		return
 	}
 
@@ -114,7 +120,7 @@ func main() {
 		err = cli.Reply(pkt, hwaddr, pkt.TargetIP)
 
 		if err != nil {
-			fmt.Println("[ERR]", "cli.Reply: ", err)
+			fmt.Fprintf(os.Stderr, "ERR cli.Reply: %s\n", err)
 		}
 	}
 }
