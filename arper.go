@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/mdlayher/arp"
 	"github.com/mdlayher/ethernet"
@@ -15,6 +16,9 @@ import (
 var (
 	ifname  = flag.String("i", "", "Network interface")
 	ethaddr = flag.String("e", "", "Ethernet address")
+	gratArp = flag.Bool("g", false, "Send gratuitous ARP")
+	gratInt = flag.Int("G", 60, "Interval to send gratuitous ARP in [seconds]")
+	gratMax = flag.Int("M", 1024, "Maximum number of IP addresses for gratuitous ARP (performance implications!)")
 
 	myNets = []net.IPNet{}
 	args   = []string{}
@@ -33,6 +37,68 @@ func netsContain(nets []net.IPNet, ip net.IP) bool {
 func usageError(errmsg string) {
 	fmt.Fprintf(os.Stderr, "ERR Usage error: %s\n\n", errmsg)
 	flag.Usage()
+}
+
+func gratuitousArp(cli *arp.Client, ip net.IP, hwaddr net.HardwareAddr, sleepInt time.Duration) {
+	hwBcast, err := net.ParseMAC("ff-ff-ff-ff-ff-ff")
+	gratArpPkt, err := arp.NewPacket(arp.OperationReply, hwaddr, ip, hwBcast, ip)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ERR arp.NewPacket: %s", err)
+		return
+	}
+
+	for {
+		err = cli.WriteTo(gratArpPkt, hwBcast)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERR cli.WriteTo: %s", err)
+			return
+		}
+
+		time.Sleep(sleepInt)
+	}
+}
+
+func incrementIP(ip *net.IP) {
+	for i := int(len(*ip)) - 1; i >= 0; i-- {
+		if (*ip)[i] >= 255 {
+			(*ip)[i] = 0
+			continue
+		} else {
+			(*ip)[i]++
+			break
+		}
+	}
+}
+
+func allIps(ipNet net.IPNet, ch chan net.IP) {
+	ch <- ipNet.IP
+
+	ones, bits := ipNet.Mask.Size() // IPMask.Size assumes canonical netmask -- as do we
+
+	if bits == 0 {
+		// Non-canonical IP
+		return
+	}
+
+	numIps := 1 << uint(bits-ones)
+	current := net.IP(ipNet.IP)
+
+	for i := 0; i < numIps; i++ {
+		ch <- current
+		incrementIP(&current)
+	}
+}
+
+func allIpsInNets(ipNets []net.IPNet) <-chan net.IP {
+	ch := make(chan net.IP)
+	go func() {
+		for _, ipNet := range ipNets {
+			allIps(ipNet, ch)
+		}
+	}()
+	return ch
 }
 
 func main() {
@@ -92,6 +158,25 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ERR arp.Dial(if): %s\n", err)
 		return
+	}
+
+	numAddr := 0
+	for _, net := range myNets {
+		ones, bits := net.Mask.Size()
+		numAddr += 1 << uint(bits-ones)
+	}
+
+	if *gratArp {
+		if numAddr > *gratMax {
+			usageError("Too many IP addresses for gratuitous ARP -- either decrease number of IP addresses or increase -M!")
+			return
+		}
+
+		sleepInt := time.Duration(*gratInt) * time.Second
+
+		for ip := range allIpsInNets(myNets) {
+			go gratuitousArp(cli, ip, hwaddr, sleepInt)
+		}
 	}
 
 	// Do the job.
