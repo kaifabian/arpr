@@ -10,7 +10,7 @@ Kudos to [mdlayher](https://github.com/mdlayher) for his awesome [arp](https://g
 Usage
 -----
 
-`arper <-i interface> [-e ethernet-address] ip_net1 [ip_net2 ...]`
+`arper <-i interface> [-e ethernet-address] [-g] [-G send-interval] [-M max-ips] ip_net1 [ip_net2 ...]`
 
 | Argument | default value | usage |
 | -------- | ------------- | ----- |
