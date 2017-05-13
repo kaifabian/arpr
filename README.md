@@ -1,4 +1,4 @@
-arper
+arper [![build status](https://travis-ci.org/kaifabian/arper.svg?branch=master)](https://travis-ci.org/kaifabian/arper)
 =====
 
 (**ARP** **e**vil **r**esponder)
