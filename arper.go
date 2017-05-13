@@ -63,11 +63,11 @@ func gratuitousArp(cli *arp.Client, ip net.IP, hwaddr net.HardwareAddr, sleepInt
 func incrementIP(ip *net.IP) {
 	for i := int(len(*ip)) - 1; i >= 0; i-- {
 		if (*ip)[i] >= 255 {
-			(*ip)[i] = 0;
-			continue;
+			(*ip)[i] = 0
+			continue
 		} else {
-			(*ip)[i] += 1;
-			break;
+			(*ip)[i]++
+			break
 		}
 	}
 }
@@ -82,7 +82,7 @@ func allIps(ipNet net.IPNet, ch chan net.IP) {
 		return
 	}
 
-	numIps := 1 << uint(bits - ones)
+	numIps := 1 << uint(bits-ones)
 	current := net.IP(ipNet.IP)
 
 	for i := 0; i < numIps; i++ {
@@ -91,13 +91,13 @@ func allIps(ipNet net.IPNet, ch chan net.IP) {
 	}
 }
 
-func AllIps(ipNets []net.IPNet) <-chan net.IP {
+func allIpsInNets(ipNets []net.IPNet) <-chan net.IP {
 	ch := make(chan net.IP)
-	go func () {
+	go func() {
 		for _, ipNet := range ipNets {
 			allIps(ipNet, ch)
 		}
-	} ();
+	}()
 	return ch
 }
 
@@ -163,7 +163,7 @@ func main() {
 	numAddr := 0
 	for _, net := range myNets {
 		ones, bits := net.Mask.Size()
-		numAddr += 1 << uint(bits - ones)
+		numAddr += 1 << uint(bits-ones)
 	}
 
 	if *gratArp {
@@ -174,7 +174,7 @@ func main() {
 
 		sleepInt := time.Duration(*gratInt) * time.Second
 
-		for ip := range AllIps(myNets) {
+		for ip := range allIpsInNets(myNets) {
 			go gratuitousArp(cli, ip, hwaddr, sleepInt)
 		}
 	}
