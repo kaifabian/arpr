@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	ifname = flag.String("i", "", "Network interface")
+	ifname  = flag.String("i", "", "Network interface")
 	ethaddr = flag.String("e", "", "Ethernet address")
 
 	myNets = []net.IPNet{}
-	args = []string{}
+	args   = []string{}
 )
 
 func netsContain(nets []net.IPNet, ip net.IP) bool {
