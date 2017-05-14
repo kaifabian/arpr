@@ -218,26 +218,26 @@ func main() {
 		return
 	}
 
-	numAddr := 0
-	for _, net := range myNets {
-		ones, bits := net.Mask.Size()
-		numAddr += 1 << uint(bits-ones)
-	}
-
 	if *gratArp {
-		if numAddr > *gratMax {
-			usageError("Too many IP addresses for gratuitous ARP -- either decrease number of IP addresses or increase -M!")
-			return
-		}
+		gratArpIps := make([]net.IP, 0)
 
 		sleepInt := time.Duration(*gratInt) * time.Second
 
 		for ip := range allIpsInNets(myNets) {
 			if !netsContain(netExcepts, ip) {
-				fmt.Fprintf(os.Stderr, "DEBUG starting gratarp: %s", ip)
-				go gratuitousArp(cli, ip, hwaddr, sleepInt)
+				if len(gratArpIps) >= *gratMax {
+					usageError("Too many IP addresses for gratuitous ARP -- either decrease number of IP addresses or increase -M!")
+					return
+				}
+
+				gratArpIps = append(gratArpIps, ip)
 			}
 		}
+
+		for _, ip := range gratArpIps {
+			go gratuitousArp(cli, ip, hwaddr, sleepInt)
+		}
+
 	}
 
 	// Do the job.
