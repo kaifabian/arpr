@@ -91,16 +91,19 @@ func gratuitousArp(cli *arp.Client, ip net.IP, hwaddr net.HardwareAddr, sleepInt
 	}
 }
 
-func incrementIP(ip *net.IP) {
-	for i := int(len(*ip)) - 1; i >= 0; i-- {
-		if (*ip)[i] >= 255 {
-			(*ip)[i] = 0
+func incrementIP(iip net.IP) net.IP {
+	oip := make(net.IP, len(iip))
+	copy(oip, iip)
+	for i := int(len(oip)) - 1; i >= 0; i-- {
+		if oip[i] >= 255 {
+			oip[i] = 0
 			continue
 		} else {
-			(*ip)[i]++
+			oip[i]++
 			break
 		}
 	}
+	return oip
 }
 
 func allIps(ipNet net.IPNet, ch chan net.IP) {
@@ -118,7 +121,7 @@ func allIps(ipNet net.IPNet, ch chan net.IP) {
 
 	for i := 0; i < numIps; i++ {
 		ch <- current
-		incrementIP(&current)
+		current = incrementIP(current)
 	}
 }
 
