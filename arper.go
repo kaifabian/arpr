@@ -178,13 +178,13 @@ func main() {
 			if zeros >= 2 {
 				if !*inclNet {
 					exclNet := &net.IPNet{netAddr(*ipnet), net.CIDRMask(bits, bits)}
-					netExcepts = append(netExcepts, *exclNet)
 					fmt.Fprintf(os.Stderr, "INFO Ignoring %s\n", exclNet.String())
+					netExcepts = append(netExcepts, *exclNet)
 				}
 				if !*inclBcast {
 					exclNet := &net.IPNet{netBcast(*ipnet), net.CIDRMask(bits, bits)}
-					netExcepts = append(netExcepts, *exclNet)
 					fmt.Fprintf(os.Stderr, "INFO Ignoring %s\n", exclNet.String())
+					netExcepts = append(netExcepts, *exclNet)
 				}
 			}
 		}
