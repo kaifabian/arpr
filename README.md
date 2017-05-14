@@ -19,7 +19,11 @@ Usage
 | -g | false | enable gratuitous ARP |
 | -G | 60 | gratuitous ARP send interval (seconds) |
 | -M | 1024 | reject gratuitous ARP if more than `-M` IPs (performance implications) |
+| -N | false | Do not exclude network base address |
+| -B | false | Do not exclude network broadcast address |
 
 `ip_net` can either be a single IP address (e. g. `10.42.13.37`) or a CIDR notation (e. g. `192.168.0.0/16`).
+If `ip_net` starts with the character `~`, `ip_net` will be *excluded*.
+(Network exclusions precede inclusions!)
 
 At least 1 `ip_net` must be provided.

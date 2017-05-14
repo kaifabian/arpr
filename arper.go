@@ -14,15 +14,32 @@ import (
 )
 
 var (
-	ifname  = flag.String("i", "", "Network interface")
-	ethaddr = flag.String("e", "", "Ethernet address")
-	gratArp = flag.Bool("g", false, "Send gratuitous ARP")
-	gratInt = flag.Int("G", 60, "Interval to send gratuitous ARP in [seconds]")
-	gratMax = flag.Int("M", 1024, "Maximum number of IP addresses for gratuitous ARP (performance implications!)")
+	ifname    = flag.String("i", "", "Network interface")
+	ethaddr   = flag.String("e", "", "Ethernet address")
+	gratArp   = flag.Bool("g", false, "Send gratuitous ARP")
+	gratInt   = flag.Int("G", 60, "Interval to send gratuitous ARP in [seconds]")
+	gratMax   = flag.Int("M", 1024, "Maximum number of IP addresses for gratuitous ARP (performance implications!)")
+	inclNet   = flag.Bool("N", false, "Include network base address")
+	inclBcast = flag.Bool("B", false, "Include network broadcast address")
 
-	myNets = []net.IPNet{}
-	args   = []string{}
+	myNets     = []net.IPNet{}
+	netExcepts = []net.IPNet{}
+	args       = []string{}
 )
+
+func netBcast(ipNet net.IPNet) net.IP {
+	ip := make(net.IP, len(ipNet.IP))
+	copy(ip, ipNet.IP)
+	ones, bits := ipNet.Mask.Size()
+
+	pos := len(ip) - 1
+	for zeros := int(bits - ones); zeros > 0 ; zeros -= 8 {
+		ip[pos] |= ((1 << uint(zeros)) - 1) & 0xFF;
+		pos--
+	}
+
+	return ip
+}
 
 func netsContain(nets []net.IPNet, ip net.IP) bool {
 	for _, net := range nets {
@@ -116,6 +133,13 @@ func main() {
 	}
 
 	for _, arg := range args {
+		exclude := false
+
+		if strings.HasPrefix(arg, "~") {
+			exclude = true
+			arg = strings.TrimPrefix(arg, "~")
+		}
+
 		if !strings.Contains(arg, "/") {
 			arg = fmt.Sprintf("%s/32", arg)
 		}
@@ -127,9 +151,28 @@ func main() {
 			return
 		}
 
-		fmt.Fprintf(os.Stderr, "INFO Listening for %s\n", ipnet.String())
+		if exclude {
+			netExcepts = append(netExcepts, *ipnet)
+		} else {
+			ones, bits := ipnet.Mask.Size()
+			zeros := (bits - ones)
 
-		myNets = append(myNets, *ipnet)
+			fmt.Fprintf(os.Stderr, "INFO Listening for %s\n", ipnet.String())
+			myNets = append(myNets, *ipnet)
+
+			if zeros >= 2 {
+				if !*inclNet {
+					exclNet := &net.IPNet{ipnet.IP, net.CIDRMask(bits, bits)}
+					netExcepts = append(netExcepts, *exclNet)
+					fmt.Fprintf(os.Stderr, "INFO Ignoring %s\n", exclNet.String())
+				}
+				if !*inclBcast {
+					exclNet := &net.IPNet{netBcast(*ipnet), net.CIDRMask(bits, bits)}
+					netExcepts = append(netExcepts, *exclNet)
+					fmt.Fprintf(os.Stderr, "INFO Ignoring %s\n", exclNet.String())
+				}
+			}
+		}
 	}
 
 	// Get interface
@@ -175,7 +218,10 @@ func main() {
 		sleepInt := time.Duration(*gratInt) * time.Second
 
 		for ip := range allIpsInNets(myNets) {
-			go gratuitousArp(cli, ip, hwaddr, sleepInt)
+			if !netsContain(netExcepts, ip) {
+				fmt.Fprintf(os.Stderr, "DEBUG starting gratarp: %s", ip)
+				go gratuitousArp(cli, ip, hwaddr, sleepInt)
+			}
 		}
 	}
 
@@ -195,6 +241,11 @@ func main() {
 
 		// Ignore packets that are no requsts
 		if pkt.Operation != arp.OperationRequest {
+			continue
+		}
+
+		// Ignore excluded IP addresses
+		if netsContain(netExcepts, pkt.TargetIP) {
 			continue
 		}
 
