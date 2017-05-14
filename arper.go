@@ -107,8 +107,6 @@ func incrementIP(iip net.IP) net.IP {
 }
 
 func allIps(ipNet net.IPNet, ch chan net.IP) {
-	ch <- ipNet.IP
-
 	ones, bits := ipNet.Mask.Size() // IPMask.Size assumes canonical netmask -- as do we
 
 	if bits == 0 {
