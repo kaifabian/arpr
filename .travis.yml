@@ -5,8 +5,7 @@ sudo: true
 addons:
   apt:
     packages:
-    - arping
-    - iproute2
+    - iproute
 before_install:
   - go get -d ./...
 install:
