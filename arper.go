@@ -41,6 +41,20 @@ func netBcast(ipNet net.IPNet) net.IP {
 	return ip
 }
 
+func netAddr(ipNet net.IPNet) net.IP {
+	ip := make(net.IP, len(ipNet.IP))
+	copy(ip, ipNet.IP)
+	ones, bits := ipNet.Mask.Size()
+
+	pos := len(ip) - 1
+	for zeros := int(bits - ones); zeros > 0 ; zeros -= 8 {
+		ip[pos] &= ^(((1 << uint(zeros)) - 1) & 0xFF);
+		pos--
+	}
+
+	return ip
+}
+
 func netsContain(nets []net.IPNet, ip net.IP) bool {
 	for _, net := range nets {
 		if net.Contains(ip) {
@@ -162,7 +176,7 @@ func main() {
 
 			if zeros >= 2 {
 				if !*inclNet {
-					exclNet := &net.IPNet{ipnet.IP, net.CIDRMask(bits, bits)}
+					exclNet := &net.IPNet{netAddr(*ipnet), net.CIDRMask(bits, bits)}
 					netExcepts = append(netExcepts, *exclNet)
 					fmt.Fprintf(os.Stderr, "INFO Ignoring %s\n", exclNet.String())
 				}
