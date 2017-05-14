@@ -27,3 +27,21 @@ If `ip_net` starts with the character `~`, `ip_net` will be *excluded*.
 (Network exclusions precede inclusions!)
 
 At least 1 `ip_net` must be provided.
+
+### Example 1:
+
+`arper -i eth0 -e 00-11-22-33-44-55 -g -G 30 10.13.37.0/24`
+
+*arper* will respond to ARP requets to `10.137.0.1 - 10.137.0.254` on *eth0* with MAC address `00-11-22-33-44-55` and send gratuitous ARP packets every 30 seconds.
+
+### Example 2:
+
+`arper -i em0 -g 10.0.0.0/8`
+
+*arper* will fail because the user requested gratuitous ARP for more than 1024 IP addresses.
+
+### Example 3:
+
+`arper -i br-test -N -B 10.0.42.64/26`
+
+*arper* will respond to ARP requests to `10.0.42.64 - 10.0.42.127` on *br-test* with the decide MAC address of *br-test*.
