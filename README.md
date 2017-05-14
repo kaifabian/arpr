@@ -44,4 +44,4 @@ At least 1 `ip_net` must be provided.
 
 `arper -i br-test -N -B 10.0.42.64/26`
 
-*arper* will respond to ARP requests to `10.0.42.64 - 10.0.42.127` on *br-test* with the decide MAC address of *br-test*.
+*arper* will respond to ARP requests to `10.0.42.64 - 10.0.42.127` on *br-test* with the device MAC address of *br-test*.
