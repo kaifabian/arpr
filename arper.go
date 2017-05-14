@@ -170,7 +170,7 @@ func main() {
 			netExcepts = append(netExcepts, *ipnet)
 		} else {
 			ones, bits := ipnet.Mask.Size()
-			zeros := (bits - ones)
+			zeros := uint(bits - ones)
 
 			fmt.Fprintf(os.Stderr, "INFO Listening for %s\n", ipnet.String())
 			myNets = append(myNets, *ipnet)
