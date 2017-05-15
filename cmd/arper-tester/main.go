@@ -143,10 +143,18 @@ func main() {
 
 	testCases := []testCase{
 		{
-			"simple1",
+			"single1",
+			[]string{"--", "10.0.42.128"},
+			arperEth,
+			[]net.IP{net.ParseIP("10.0.42.128")},
+			[]net.IP{net.ParseIP("10.0.42.127"), net.ParseIP("10.0.42.129"), net.ParseIP("10.0.42.255")},
+		},
+
+		{
+			"net1",
 			[]string{"--", "10.0.42.128/25"},
 			arperEth,
-			[]net.IP{net.ParseIP("10.0.42.129"), net.ParseIP("10.0.42.254")},
+			[]net.IP{net.ParseIP("10.0.42.129"), net.ParseIP("10.0.42.170"), net.ParseIP("10.0.42.254")},
 			[]net.IP{net.ParseIP("10.0.42.1"), net.ParseIP("10.0.42.128"), net.ParseIP("10.0.42.255")},
 		},
 
@@ -154,8 +162,32 @@ func main() {
 			"exclude1",
 			[]string{"--", "10.0.42.128/25", "~10.0.42.142"},
 			arperEth,
-			[]net.IP{net.ParseIP("10.0.42.129"), net.ParseIP("10.0.42.254")},
+			[]net.IP{net.ParseIP("10.0.42.141"), net.ParseIP("10.0.42.143")},
 			[]net.IP{net.ParseIP("10.0.42.142")},
+		},
+
+		{
+			"netexlude1",
+			[]string{"-N", "--", "10.0.42.128/25", "~10.0.42.142"},
+			arperEth,
+			[]net.IP{net.ParseIP("10.0.42.128")},
+			[]net.IP{net.ParseIP("10.0.42.255")},
+		},
+
+		{
+			"netexlude2",
+			[]string{"-B", "--", "10.0.42.128/25", "~10.0.42.142"},
+			arperEth,
+			[]net.IP{net.ParseIP("10.0.42.255")},
+			[]net.IP{net.ParseIP("10.0.42.128")},
+		},
+
+		{
+			"customMac1",
+			[]string{"-e", "00-11-de-ad-be-ef", "--", "10.0.42.42"},
+			parseMAC("00-11-de-ad-be-ef"),
+			[]net.IP{net.ParseIP("10.0.42.42")},
+			[]net.IP{},
 		},
 	}
 
