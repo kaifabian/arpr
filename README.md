@@ -7,8 +7,16 @@ The `arpr` utility is a configurable ARP responder.
 Kudos to [mdlayher](https://github.com/mdlayher) for his awesome [arp](https://github.com/mdlayher/arp) package!
 (He did all the heavy lifting.)
 
-Usage
------
+
+## Installation
+
+(Make sure that you have the Go environment installed and set up...)
+
+`go get github.com/kaifabian/arpr/cmd/arpr` installs the arpr binary into the `$GOPATH/bin` directory.
+Of course you can then copy the binary to a more convenient location, e. g. `/usr/local/bin`.
+
+
+## Usage
 
 `arpr <-i interface> [-e ethernet-address] [-g] [-G send-interval] [-M max-ips] ip_net1 [ip_net2 ...]`
 
