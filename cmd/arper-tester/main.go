@@ -211,4 +211,10 @@ func main() {
 	}
 
 	fmt.Fprintf(os.Stdout, "\tOVERALL PASSED %d/%d cases (%d/%d tests)\n", (overallCases - failCases), overallCases, (overallTests - failTests), overallTests)
+
+	if failTests > 0 {
+		os.Exit(1)
+	}
+
+	os.Exit(0)
 }
