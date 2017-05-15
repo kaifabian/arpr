@@ -167,7 +167,7 @@ func main() {
 		},
 
 		{
-			"netexlude1",
+			"netExclude1",
 			[]string{"-N", "--", "10.0.42.128/25", "~10.0.42.142"},
 			arperEth,
 			[]net.IP{net.ParseIP("10.0.42.128")},
@@ -175,7 +175,7 @@ func main() {
 		},
 
 		{
-			"netexlude2",
+			"netExclude2",
 			[]string{"-B", "--", "10.0.42.128/25", "~10.0.42.142"},
 			arperEth,
 			[]net.IP{net.ParseIP("10.0.42.255")},
