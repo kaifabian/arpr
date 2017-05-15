@@ -17,4 +17,4 @@ before_script:
   - sudo ip addr add 10.0.42.1/24 dev if-test
   - go get -v ./...
 script:
-  - arper-tester -i br-test -c if-test
+  - sudo arper-tester -i br-test -c if-test
