@@ -1,16 +1,16 @@
-arper [![build status](https://travis-ci.org/kaifabian/arper.svg?branch=master)](https://travis-ci.org/kaifabian/arper)
+arpr [![build status](https://travis-ci.org/kaifabian/arpr.svg?branch=master)](https://travis-ci.org/kaifabian/arpr)
 =====
 
-(**ARP** **e**vil **r**esponder)
+(**ARP** **r**esponder)
 
-The `arper` utility is a configurable ARP responder.
+The `arpr` utility is a configurable ARP responder.
 Kudos to [mdlayher](https://github.com/mdlayher) for his awesome [arp](https://github.com/mdlayher/arp) package!
 (He did all the heavy lifting.)
 
 Usage
 -----
 
-`arper <-i interface> [-e ethernet-address] [-g] [-G send-interval] [-M max-ips] ip_net1 [ip_net2 ...]`
+`arpr <-i interface> [-e ethernet-address] [-g] [-G send-interval] [-M max-ips] ip_net1 [ip_net2 ...]`
 
 | Argument | default value | usage |
 | -------- | ------------- | ----- |
@@ -30,24 +30,24 @@ At least 1 `ip_net` must be provided.
 
 ### Example 1:
 
-`arper -i eth0 -e 00-11-22-33-44-55 -g -G 30 10.13.37.0/24`
+`arpr -i eth0 -e 00-11-22-33-44-55 -g -G 30 10.13.37.0/24`
 
-*arper* will respond to ARP requets to `10.137.0.1 - 10.137.0.254` on *eth0* with MAC address `00-11-22-33-44-55` and send gratuitous ARP packets every 30 seconds.
+*arpr* will respond to ARP requets to `10.137.0.1 - 10.137.0.254` on *eth0* with MAC address `00-11-22-33-44-55` and send gratuitous ARP packets every 30 seconds.
 
 ### Example 2:
 
-`arper -i em0 -g 10.0.0.0/8`
+`arpr -i em0 -g 10.0.0.0/8`
 
-*arper* will fail because the user requested gratuitous ARP for more than 1024 IP addresses.
+*arpr* will fail because the user requested gratuitous ARP for more than 1024 IP addresses.
 
 ### Example 3:
 
-`arper -i br-test -N -B 10.0.42.64/26`
+`arpr -i br-test -N -B 10.0.42.64/26`
 
-*arper* will respond to ARP requests to `10.0.42.64 - 10.0.42.127` on *br-test* with the device MAC address of *br-test*.
+*arpr* will respond to ARP requests to `10.0.42.64 - 10.0.42.127` on *br-test* with the device MAC address of *br-test*.
 
 ### Example 4:
 
-`arper -i enp0s1 10.0.0.0/8 ~10.42.0.0/16`
+`arpr -i enp0s1 10.0.0.0/8 ~10.42.0.0/16`
 
-*arper* will respond to ARP requests to `10.0.0.1 - 10.41.255.255` and `10.43.0.0 - 10.255.255.254` on *enp0s1* with the device MAC address of *enp0s1*.
+*arpr* will respond to ARP requests to `10.0.0.1 - 10.41.255.255` and `10.43.0.0 - 10.255.255.254` on *enp0s1* with the device MAC address of *enp0s1*.

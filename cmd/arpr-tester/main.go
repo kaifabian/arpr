@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	arperPath = flag.String("a", "arper", "path to arper binary")
-	arperIf   = flag.String("i", "", "arper interface")
+	arprPath = flag.String("a", "arpr", "path to arpr binary")
+	arprIf   = flag.String("i", "", "arpr interface")
 	cliIf     = flag.String("c", "", "client test interface")
 	timeOut   = flag.Uint("t", 100, "timeout in milliseconds")
 )
@@ -36,17 +36,17 @@ type testRun struct {
 	Tests    uint
 }
 
-func spawnArper(customArg ...string) *exec.Cmd {
+func spawnArpr(customArg ...string) *exec.Cmd {
 	arg := []string{
 		"-i",
-		*arperIf,
+		*arprIf,
 	}
 
 	for _, v := range customArg {
 		arg = append(arg, v)
 	}
 
-	cmd := exec.Command(*arperPath, arg...)
+	cmd := exec.Command(*arprPath, arg...)
 	cmd.Start()
 	return cmd
 }
@@ -63,7 +63,7 @@ func parseMAC(mac string) net.HardwareAddr {
 
 func runTestCase(testCase *testCase, ifi *net.Interface) *testRun {
 	run := &testRun{testCase, nil, 0, 0}
-	run.Cmd = spawnArper(testCase.Arg...)
+	run.Cmd = spawnArpr(testCase.Arg...)
 
 	time.Sleep(1 * time.Second)
 
@@ -131,20 +131,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	afi, err := net.InterfaceByName(*arperIf)
+	afi, err := net.InterfaceByName(*arprIf)
 
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "FAIL HARD cannot open interface %s: %s\n", *cliIf, err)
 		os.Exit(1)
 	}
 
-	arperEth := afi.HardwareAddr
+	arprEth := afi.HardwareAddr
 
 	testCases := []testCase{
 		{
 			"single1",
 			[]string{"--", "10.0.42.128"},
-			arperEth,
+			arprEth,
 			[]net.IP{net.ParseIP("10.0.42.128")},
 			[]net.IP{net.ParseIP("10.0.42.127"), net.ParseIP("10.0.42.129"), net.ParseIP("10.0.42.255")},
 		},
@@ -152,7 +152,7 @@ func main() {
 		{
 			"net1",
 			[]string{"--", "10.0.42.128/25"},
-			arperEth,
+			arprEth,
 			[]net.IP{net.ParseIP("10.0.42.129"), net.ParseIP("10.0.42.170"), net.ParseIP("10.0.42.254")},
 			[]net.IP{net.ParseIP("10.0.42.1"), net.ParseIP("10.0.42.128"), net.ParseIP("10.0.42.255")},
 		},
@@ -160,7 +160,7 @@ func main() {
 		{
 			"exclude1",
 			[]string{"--", "10.0.42.128/25", "~10.0.42.142"},
-			arperEth,
+			arprEth,
 			[]net.IP{net.ParseIP("10.0.42.141"), net.ParseIP("10.0.42.143")},
 			[]net.IP{net.ParseIP("10.0.42.142")},
 		},
@@ -168,7 +168,7 @@ func main() {
 		{
 			"netExclude1",
 			[]string{"-N", "--", "10.0.42.128/25", "~10.0.42.142"},
-			arperEth,
+			arprEth,
 			[]net.IP{net.ParseIP("10.0.42.128")},
 			[]net.IP{net.ParseIP("10.0.42.255")},
 		},
@@ -176,7 +176,7 @@ func main() {
 		{
 			"netExclude2",
 			[]string{"-B", "--", "10.0.42.128/25", "~10.0.42.142"},
-			arperEth,
+			arprEth,
 			[]net.IP{net.ParseIP("10.0.42.255")},
 			[]net.IP{net.ParseIP("10.0.42.128")},
 		},
@@ -196,7 +196,7 @@ func main() {
 	failCases := uint(0)
 	overallCases := uint(0)
 
-	fmt.Fprintf(os.Stdout, "\tARPER TEST RUNNER\n\n")
+	fmt.Fprintf(os.Stdout, "\tARPR TEST RUNNER\n\n")
 
 	for _, testCase := range testCases {
 		testRun := runTestCase(&testCase, ifi)
