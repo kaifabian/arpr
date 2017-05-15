@@ -13,9 +13,10 @@ import (
 )
 
 var (
-	arperIf = flag.String("i", "", "arper interface")
-	cliIf   = flag.String("c", "", "client test interface")
-	timeOut = flag.Uint("t", 100, "timeout in milliseconds")
+	arperPath = flag.String("a", "arper", "path to arper binary")
+	arperIf   = flag.String("i", "", "arper interface")
+	cliIf     = flag.String("c", "", "client test interface")
+	timeOut   = flag.Uint("t", 100, "timeout in milliseconds")
 )
 
 type testCase struct {
@@ -45,7 +46,7 @@ func spawnArper(customArg ...string) *exec.Cmd {
 		arg = append(arg, v)
 	}
 
-	cmd := exec.Command("arper", arg...)
+	cmd := exec.Command(*arperPath, arg...)
 	cmd.Start()
 	return cmd
 }
