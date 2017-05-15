@@ -33,8 +33,8 @@ func netBcast(ipNet net.IPNet) net.IP {
 	ones, bits := ipNet.Mask.Size()
 
 	pos := len(ip) - 1
-	for zeros := int(bits - ones); zeros > 0 ; zeros -= 8 {
-		ip[pos] |= ((1 << uint(zeros)) - 1) & 0xFF;
+	for zeros := int(bits - ones); zeros > 0; zeros -= 8 {
+		ip[pos] |= ((1 << uint(zeros)) - 1) & 0xFF
 		pos--
 	}
 
@@ -47,8 +47,8 @@ func netAddr(ipNet net.IPNet) net.IP {
 	ones, bits := ipNet.Mask.Size()
 
 	pos := len(ip) - 1
-	for zeros := int(bits - ones); zeros > 0 ; zeros -= 8 {
-		ip[pos] &= ^(((1 << uint(zeros)) - 1) & 0xFF);
+	for zeros := int(bits - ones); zeros > 0; zeros -= 8 {
+		ip[pos] &= ^(((1 << uint(zeros)) - 1) & 0xFF)
 		pos--
 	}
 

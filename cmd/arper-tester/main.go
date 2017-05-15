@@ -21,19 +21,19 @@ var (
 
 type testCase struct {
 	Name string
-	Arg []string
+	Arg  []string
 
 	ExpectEth net.HardwareAddr
 
 	ArpSuccess []net.IP
-	ArpFail []net.IP
+	ArpFail    []net.IP
 }
 
 type testRun struct {
 	TestCase *testCase
-	Cmd *exec.Cmd
-	Fails uint
-	Tests uint
+	Cmd      *exec.Cmd
+	Fails    uint
+	Tests    uint
 }
 
 func spawnArper(customArg ...string) *exec.Cmd {
@@ -116,7 +116,6 @@ func runTestCase(testCase *testCase, ifi *net.Interface) *testRun {
 
 	fmt.Fprintf(os.Stderr, "\n")
 
-
 	run.Cmd.Process.Kill()
 
 	return run
@@ -191,10 +190,10 @@ func main() {
 		},
 	}
 
-	failTests    := uint(0)
+	failTests := uint(0)
 	overallTests := uint(0)
 
-	failCases    := uint(0)
+	failCases := uint(0)
 	overallCases := uint(0)
 
 	fmt.Fprintf(os.Stdout, "\tARPER TEST RUNNER\n\n")
