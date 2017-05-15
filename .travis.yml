@@ -11,6 +11,10 @@ before_install:
 install:
   - go build -v ./...
 before_script:
-  - sudo ip link add name br-test type bridge
+  - sudo ip link add if-test type veth peer name br-test
   - sudo ip link set br-test up
-  - sudo ip addr add 10.0.42.1/24 dev br-test
+  - sudo ip link set if-test up
+  - sudo ip addr add 10.0.42.1/24 dev if-test
+  - go get -v ./...
+script:
+  - arper-tester -i br-test -c if-test
